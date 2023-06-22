@@ -7,7 +7,7 @@ az acr build --image demos/demo:v2.0 --registry
 az acr repository show-tags --name "<registry name>"
 az acr run --registry "<registry name>" --cmd '$Registry/
 We could have also used the az acr task list-runs --registry "<registry
-that az acr run provides.
+
 az acr update -n "<acr name>" --admin-enabled true
 az acr credential show -n "<acr name>" --query
 
