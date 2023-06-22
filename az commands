@@ -1,0 +1,63 @@
+
+az acr create --resource-group "<resource group name>" -n
+az acr login -n "<acr login server>"
+az acr repository list --name <registry name> -o tsv
+az acr repository show-tags --name <registry name>
+az acr build --image demos/demo:v2.0 --registry
+az acr repository show-tags --name "<registry name>"
+az acr run --registry "<registry name>" --cmd '$Registry/
+We could have also used the az acr task list-runs --registry "<registry
+that az acr run provides.
+az acr update -n "<acr name>" --admin-enabled true
+az acr credential show -n "<acr name>" --query
+
+az container create -g "<resource group name>" -n
+az container show -g "<resource group name>" -n
+az container show -g "<resource group name>" -n
+az storage account create -n "<storage account name>" -g
+az storage share create -n "acishare" --account-name
+az storage account keys list -g "<resource group name>"
+az container create -g "<resource group name>" -n
+az group delete -n "<resource group name>"
+
+az appservice plan create -n "<plan name>" -g "<resource
+az webapp list-runtimes --linux -o tsv
+this point. If you were to use the az webapp up (don't do it right now) CLI command, it
+az webapp create -n "<globally unique name>" -g
+az webapp up -n "<name of the Windows web app>" --html -b
+az acr create -g "<resource group>" -n "<ACR name>" --sku
+az acr update -n "<ACR name>" --admin-enabled true
+az acr credential show -n "<ACR name>" --query
+az acr build --image "chapter3:1.0.0" --image
+
+az webapp config container set -g "<resource group>" -n
+az webapp show -g "<resource group>" -n "<app-service>" --query
+az webapp show -g "<resource group>" -n "<app-service>" --query
+az acr build --image "chapter3:1.1.0" --image
+az webapp restart -g "<resource group>" -n
+az webapp config appsettings set -g "<resource group>" -n
+az webapp cors add -g "<resource group>" -n
+az acr build --image "chapter3:1.2.0" --image
+az webapp deployment slot create -g "<resource group>"
+
+az group create -n "<name>" -l "<location>"
+az storage account create -n "<name>" -g "<resource group
+az storage account keys list -n "<name>" -g "<resource
+az storage container create -n "<name>" --account-name
+az group create -n "<name>" -l "<location>"
+
+az keyvault create -n "<unique vault name>" -g "<resource
+az keyvault secret set --vault-name "<vault name>" --name
+az keyvault secret show --vault-name "<vault name>"
+az identity create -n "<name>" -g "<resource group name>"
+
+az appservice plan create -n "< App Service plan name>"
+az webapp create -n "<web app name>" -g "<resource group
+az webapp identity assign -n "<app name>" -g "<resource
+
+az appconfig create -n "<unique name>" -g "<resource
+az appconfig kv set -n "<App Config name>" --key
+az appconfig kv set -n "<App Config name>" --key
+az appconfig kv set -n "<App Config name>" --key
+az group create --location eastus2 --name AzureCache-RG
+az redis create --location eastus2 --name $account --resource☻group AzureCache-RG --sku Basic --vm-size C0
