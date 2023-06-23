@@ -1,0 +1,87 @@
+using static System.Formats.Asn1.AsnWriter;
+using System.Diagnostics;
+using Azure;
+using BlazorTableView.Models;
+using Azure.Data.Tables;
+using Azure.Data.Tables.Models;
+
+namespace BlazorTableView.Data
+{
+    public class TableService
+    {
+        //az keyvault create -n "<unique vault name>" -g "<resource group name>" -l "<location>"
+        //az identity create -n "<name>" -g "<resource group name>"
+        string ConnectionString = ""; 
+        string TableName = "Store";
+
+        private List<StoreModel> storeList = new();
+        public string BrandName = "ABC";
+
+        public TableService()
+        {
+
+        }
+        /*private async Task<List<StoreModel>> QuickRead(string bradName)
+        {
+
+            var tableClient = new TableClient(ConnectionString, TableName);
+            Pageable<TableItem> queryTableResults = tableClient.Query<List<StoreModel>>();
+            return queryTableResults.ToList();
+        }
+        */
+        public async Task <List<StoreModel>> GetStores(string brand)
+        { 
+            if (storeList.Count > 0 && BrandName == brand)
+                return storeList;
+            await ListTable(ConnectionString, TableName, brand);
+            BrandName = brand;
+            return storeList;
+        }
+    
+
+        public async Task AddStoreToTable(string connectionString, string tableName, StoreModel store)
+        {
+            try
+            {
+                var tableClient = new TableClient(connectionString, tableName);
+                await tableClient.CreateIfNotExistsAsync();
+                await tableClient.AddEntityAsync(store);
+            }
+            catch (Exception ex)
+            {
+                await Console.Out.WriteLineAsync($"Error Message: {ex.Message}");
+            }
+        }
+        public async Task ListTable(string connectionString, string tableName, string rowKey)
+        {
+            List<StoreModel> stores = new();
+            try
+            {
+                var tableClient = new TableClient(connectionString, tableName);
+                Pageable<StoreModel> queryResultsFilter = tableClient.Query<StoreModel>(filter: $"RowKey eq '{rowKey}'");
+                foreach (StoreModel qEntity in queryResultsFilter)
+                {
+                    stores.Add(qEntity);
+                }
+                await Console.Out.WriteLineAsync($"Found {queryResultsFilter.Count()} entries");
+            }
+            catch (Exception ex)
+            {
+                await Console.Out.WriteLineAsync($"Error messae:{ex.Message}");
+            }
+            storeList = stores; // save in cache
+
+        }
+
+        public List<StoreModel> ReadStoresfromStrings(string[] lines)
+        {
+            List<StoreModel> stores = new List<StoreModel>();
+            for (int i = 1; i < lines.Count(); i++)
+            {
+                string[] subParts = lines[i].Split("\t");
+                stores.Add(new StoreModel(subParts[0], subParts[4], subParts[3], subParts[1]));
+            }
+            return stores;
+        }
+    }
+}
