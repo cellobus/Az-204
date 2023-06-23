@@ -1,0 +1,37 @@
+
+namespace AzFuncaz204
+{
+    public class NewHttpFunc
+    {
+        private readonly ILogger _logger;
+
+        public NewHttpFunc(ILoggerFactory loggerFactory)
+        {
+            _logger = loggerFactory.CreateLogger<NewHttpFunc>();
+        }
+
+        [Function("NewHttpFunc")]
+        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData req)
+        {
+            var response = req.CreateResponse(HttpStatusCode.OK);
+            string KeyVaultUri = "https://az204kvfbs230621.vault.azure.net/";
+            string SecretName = "BlobKey";
+            string userAssignedClientId = "7d905414-7854-4d2b-be3c-12ec36bffcb1"; //From managed Identity 
+            try
+            {
+                
+                var credential = new DefaultAzureCredential(new DefaultAzureCredentialOptions
+                {
+                    ManagedIdentityClientId = userAssignedClientId
+                });
+                var client = new SecretClient(new Uri(KeyVaultUri), credential);
+                KeyVaultSecret secret = await client.GetSecretAsync(SecretName);
+                response.WriteString($"Secret value: {secret.Value}");
+            }
+            catch (Exception ex) {
+                response.WriteString($"Exception: {ex.Message}");    
+            }
+            return response;
+        }
+    }
+}
