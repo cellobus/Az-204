@@ -1,0 +1,75 @@
+/* Creating resources:
+
+az group create -l eastus -n MessagingDemo-RG
+
+account=msg$RANDOM
+
+az storage account create --name $account --resource-group MessagingDemo-RG 
+
+# retrieve key
+key=$(az storage account keys list --account-name $account --query [0].value -o tsv)
+
+# create storage container by using key
+az storage table create --name demo --account-name $account  --account-key $key
+
+# retrieve storage connection string for next demo code
+echo 'your storage account connection string:'
+az storage account show-connection-string --name $account --resource-group MessagingDemo-RG --query connectionString
+*/
+
+public class TheMessage
+    {
+        public string MsgID { get; set; }
+        public string Info { get; set; }
+    }
+
+    class Program
+    {
+        static string connectionString = "<your connection string from previous script run>";
+        static string queueName = "demo";
+
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Your publisher just started!");
+
+            var client = CreateQueueClient(); //build client
+
+            // sending 30 messages 
+            for( var i=0; i< 30; i++ )
+            {
+               string msg = JsonSerializer.Serialize( new TheMessage(){ MsgID = $"{i}", Info = $"Simple messaging #{i}"});
+               InsertMessage(client, msg);
+            }
+        }
+
+        public static QueueClient CreateQueueClient()
+        {
+            try
+            {
+                
+                QueueClient queueClient = new QueueClient(connectionString, queueName);
+
+                queueClient.CreateIfNotExists();    // Create the queue
+
+                if (queueClient.Exists())
+                    Console.WriteLine($"The queue created: '{queueClient.Name}'");
+
+                return queueClient;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception: {ex.Message}\n\n");
+                throw;
+            }
+        }
+
+
+        public static void InsertMessage(QueueClient queueClient, string message)
+        {
+            //sending messages from 
+            queueClient.SendMessage(message);
+
+            Console.WriteLine($"Message inserted");
+        }      
+    }
+}
