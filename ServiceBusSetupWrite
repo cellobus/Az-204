@@ -1,0 +1,60 @@
+/*
+##########################################################################################
+# This commands should be executed in bash. 
+
+az group create -l eastus -n MessagingDemo-RG
+
+account=sb$RANDOM
+
+# create a service bus namespace 
+az servicebus namespace create --name $account --resource-group MessagingDemo-RG
+
+# create a service bus simple queue 
+az servicebus queue create --name "simple-queue" --namespace-name $account --resource-group MessagingDemo-RG 
+
+# create a service bus session queue 
+az servicebus queue create --name "advanced-queue" --namespace-name $account --resource-group MessagingDemo-RG --enable-partitioning --enable-session --enable-dead-lettering-on-message-expiration
+
+# create a service bus topic 
+az servicebus topic create --name "booking" --namespace-name $account --resource-group MessagingDemo-RG
+
+# create subscription for flight-booking
+az servicebus topic subscription create --name "flight-booking" --topic-name "booking" --namespace-name $account --resource-group MessagingDemo-RG
+
+# create subscription for hotel-booking
+az servicebus topic subscription create --name "hotel-booking" --topic-name "booking" --namespace-name $account --resource-group MessagingDemo-RG
+
+# create authorization SAS
+az servicebus namespace authorization-rule create --namespace-name $account --name manage --rights Manage Send Listen --resource-group MessagingDemo-RG
+
+# list connection string
+echo 'your queue connection string:'
+az servicebus namespace authorization-rule keys list --name manage --namespace-name $account --resource-group MessagingDemo-RG --query primaryConnectionString -o tsv
+##########################################################################################
+*/
+  class Program
+    {
+        static string connectionString = "<your connection string from previous script run>";
+        static string queueName = "simple-queue";
+        static string[] citylist = new[] { "NYC", "London", "New Delhi", "Beijing", "Sydney" };
+
+        static async Task Main()
+        {
+            ServiceBusClient client = new ServiceBusClient(connectionString);
+            ServiceBusSender sender = client.CreateSender(queueName);
+
+            var i = 0;
+            foreach (var city in citylist)
+            {
+                var msg = JsonSerializer.Serialize(new Booking { HotelBookings = new[] { new Booking.HotelBooking() { City = city, CheckinDate = DateTime.Now, LeaveDate = DateTime.Now.AddDays(1) } } });
+                ServiceBusMessage message = new ServiceBusMessage(msg); // create a message that we can send.UTB-8
+                await sender.SendMessageAsync(message);
+
+                Console.WriteLine($"Message #{++i} was sent");
+            }
+            //release resources
+            await sender.CloseAsync();
+        }
+    }
+//************************************************
+
