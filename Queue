@@ -31,7 +31,6 @@ public class TheMessage
         static void Main(string[] args)
         {
             Console.WriteLine("Your publisher just started!");
-
             var client = CreateQueueClient(); //build client
 
             // sending 30 messages 
@@ -46,14 +45,11 @@ public class TheMessage
         {
             try
             {
-                
                 QueueClient queueClient = new QueueClient(connectionString, queueName);
-
                 queueClient.CreateIfNotExists();    // Create the queue
 
                 if (queueClient.Exists())
                     Console.WriteLine($"The queue created: '{queueClient.Name}'");
-
                 return queueClient;
             }
             catch (Exception ex)
@@ -63,12 +59,10 @@ public class TheMessage
             }
         }
 
-
         public static void InsertMessage(QueueClient queueClient, string message)
         {
             //sending messages from 
             queueClient.SendMessage(message);
-
             Console.WriteLine($"Message inserted");
         }      
     }
